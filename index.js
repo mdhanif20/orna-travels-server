@@ -15,61 +15,34 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
      await client.connect();
-     const database = client.db("NewsPortal");
-     const newsCollection = database.collection("allnews");
-     const usersCollection = database.collection("users");
-        
-        app.get("/news", async(req,res)=>{
-            const loadNews = newsCollection.find({});
-            const news = await loadNews.toArray();
-            res.send(news);
-        })
+        const database = client.db("travelsInfo");
+        const services = database.collection("services");
+        const bookingDetails = database.collection("booking"); 
 
-        app.get("/news/:type",async(req,res)=>{
-            const type = req.params.type;
-            const news = {type:type};
-            const info = newsCollection.find(news);
-            const result = await info.toArray();
-            res.send(result)
+        app.get("/service", async(req,res)=>{
+            const loadService = services.find({});
+            const result = await loadService.toArray();
+            res.send(result);
         })
-
-        app.delete("/news/:id", async(req,res)=>{
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) }
-            const result =  await newsCollection.deleteOne(query)
-            res.json(result)
+        // booking set 
+        app.post("/booking", async(req,res)=>{
+          const customer = req.body;
+          const result = await bookingDetails.insertOne(customer);
+          res.json(result);
+        }) 
+         // booking get 
+        app.get("/manageBooking",async(req,res)=>{
+          const getCustomer = bookingDetails.find({});
+          const customer = await getCustomer.toArray();
+          res.send(customer);
+        }) 
+        //DELETE API
+        app.delete("/manageBooking/:id",async(req,res)=>{
+          const id = req.params.id;
+          const query = {_id: ObjectId(id)};
+          const result = await bookingDetails.deleteOne(query);
+          res.json(result);
         })
-        
-        app.post("/news",async(req,res)=>{
-            const news = req.body;
-            const result = await newsCollection.insertOne(news);
-            res.json(result)
-          })
-
-        app.post("/user",async(req,res)=>{
-            const user = req.body;
-            const result = await usersCollection.insertOne(user);
-            res.json(result)
-          })
-
-        app.put("/news/:id",async(req,res)=>{
-            const id = req.params.id;
-            const news = req.body;
-            const filter = { _id: ObjectId(id) };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: {
-                  type: news.type,
-                  img: news.img,
-                  time: news.time,
-                  heading: news.heading,
-                  details: news.details,
-                },
-              };
-            const result = await newsCollection.updateOne(filter,updateDoc,options)
-            res.json(result)
-        })
-    
         }
     finally{
         // await client.close();
