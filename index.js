@@ -18,6 +18,7 @@ async function run(){
         const database = client.db("travelsInfo");
         const services = database.collection("services");
         const bookingDetails = database.collection("booking"); 
+        const popularTour = database.collection("popularTour");
 
         app.get("/service", async(req,res)=>{
             const loadService = services.find({});
@@ -42,6 +43,12 @@ async function run(){
           const query = {_id: ObjectId(id)};
           const result = await bookingDetails.deleteOne(query);
           res.json(result);
+        })
+        // popular area data get 
+        app.get("/popular",async(req,res)=>{
+          const getPopularTour = popularTour.find({});
+          const result = await getPopularTour.toArray();
+          res.send(result);
         })
         }
     finally{
