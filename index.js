@@ -1,7 +1,6 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
-// const admin = require("firebase-admin"); 
 const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config();
